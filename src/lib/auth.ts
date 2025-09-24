@@ -1,5 +1,4 @@
 import { getServerSession } from 'next-auth'
-import { NextRequest } from 'next/server'
 
 export async function getAuthSession() {
   return await getServerSession()

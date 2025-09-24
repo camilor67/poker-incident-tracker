@@ -16,7 +16,7 @@ const handler = NextAuth({
     })
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user }) {
       // Check if email is in the allowed list
       if (user.email && ALLOWED_EMAILS.includes(user.email)) {
         return true
@@ -25,10 +25,10 @@ const handler = NextAuth({
         return false
       }
     },
-    async session({ session, token }) {
+    async session({ session }) {
       return session
     },
-    async jwt({ token, account, profile }) {
+    async jwt({ token }) {
       return token
     }
   },

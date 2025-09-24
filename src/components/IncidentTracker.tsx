@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useIncidentTracker } from '@/hooks/useIncidentTracker';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
 export default function IncidentTracker() {
   const { incidentData, isLoading, updateLastIncidentDate, resetIncidentTracker } = useIncidentTracker();
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const [selectedDate, setSelectedDate] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const router = useRouter();
@@ -204,7 +204,7 @@ export default function IncidentTracker() {
 
         {/* Footer */}
         <div className="text-center mt-12 text-gray-500">
-          <p>Remember: It's not about the cards you're dealt, it's about not dealing with incidents! 🃏</p>
+          <p>Remember: It&apos;s not about the cards you&apos;re dealt, it&apos;s about not dealing with incidents! 🃏</p>
         </div>
       </div>
     </div>
