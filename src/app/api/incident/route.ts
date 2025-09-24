@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { redis, INCIDENT_KEY } from '@/lib/kv';
+import { requireAuth } from '@/lib/auth';
 
 export async function GET() {
   try {
@@ -13,6 +14,12 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check authentication
+    const authResult = await requireAuth();
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+
     const body = await request.json();
     const { lastIncidentDate, daysWithoutIncident } = body;
     
@@ -29,8 +36,14 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function DELETE() {
+export async function DELETE(request: NextRequest) {
   try {
+    // Check authentication
+    const authResult = await requireAuth();
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+
     await redis.del(INCIDENT_KEY);
     return NextResponse.json({ success: true });
   } catch (error) {

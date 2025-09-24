@@ -1,12 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useIncidentTracker } from '@/hooks/useIncidentTracker';
+import { useSession, signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export default function IncidentTracker() {
   const { incidentData, isLoading, updateLastIncidentDate, resetIncidentTracker } = useIncidentTracker();
+  const { data: session, status } = useSession();
   const [selectedDate, setSelectedDate] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const router = useRouter();
+
+  // Don't redirect automatically - allow public reading
+  // useEffect(() => {
+  //   if (status === 'unauthenticated') {
+  //     router.push('/auth/signin');
+  //   }
+  // }, [status, router]);
 
   const handleDateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,15 +56,37 @@ export default function IncidentTracker() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-gray-800 mb-4">
-            🃏 Poker Tournament
-          </h1>
+          <div className="flex justify-between items-center mb-4">
+            <div></div>
+            <h1 className="text-5xl font-bold text-gray-800">
+              🃏 Poker Tournament
+            </h1>
+            <div className="flex items-center gap-2">
+              {session ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600">
+                    {session.user?.name}
+                  </span>
+                  <button
+                    onClick={() => signOut()}
+                    className="text-sm text-red-500 hover:text-red-700"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => router.push('/auth/signin')}
+                  className="text-sm text-blue-500 hover:text-blue-700"
+                >
+                  Sign in
+                </button>
+              )}
+            </div>
+          </div>
           <h2 className="text-3xl font-semibold text-gray-600 mb-2">
             Days Without Incident
           </h2>
-          <p className="text-gray-500 text-lg">
-            Track your clean tournament runs
-          </p>
         </div>
 
         {/* Main Counter */}
@@ -73,24 +106,26 @@ export default function IncidentTracker() {
             </span>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={() => setShowDatePicker(!showDatePicker)}
-              className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-8 rounded-xl transition-colors duration-200 shadow-lg hover:shadow-xl"
-            >
-              {incidentData.lastIncidentDate ? 'Update Last Incident' : 'Record First Incident'}
-            </button>
-            
-            {incidentData.lastIncidentDate && (
+          {/* Action Buttons - Only for authenticated users */}
+          {session && (
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                onClick={handleReset}
-                className="bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-8 rounded-xl transition-colors duration-200 shadow-lg hover:shadow-xl"
+                onClick={() => setShowDatePicker(!showDatePicker)}
+                className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-8 rounded-xl transition-colors duration-200 shadow-lg hover:shadow-xl"
               >
-                Reset Tracker
+                {incidentData.lastIncidentDate ? 'Update Last Incident' : 'Record First Incident'}
               </button>
-            )}
-          </div>
+              
+              {incidentData.lastIncidentDate && (
+                <button
+                  onClick={handleReset}
+                  className="bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-8 rounded-xl transition-colors duration-200 shadow-lg hover:shadow-xl"
+                >
+                  Reset Tracker
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Date Picker Modal */}
@@ -169,7 +204,7 @@ export default function IncidentTracker() {
 
         {/* Footer */}
         <div className="text-center mt-12 text-gray-500">
-          <p>Keep your tournament runs clean! 🎯</p>
+          <p>Remember: It's not about the cards you're dealt, it's about not dealing with incidents! 🃏</p>
         </div>
       </div>
     </div>
