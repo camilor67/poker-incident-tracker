@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { kv, INCIDENT_KEY } from '@/lib/kv';
+import { redis, INCIDENT_KEY } from '@/lib/kv';
 
 export async function GET() {
   try {
-    const data = await kv.get(INCIDENT_KEY);
+    const data = await redis.get(INCIDENT_KEY);
     return NextResponse.json(data);
   } catch (error) {
     console.error('Error fetching incident data:', error);
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       daysWithoutIncident,
     };
     
-    await kv.set(INCIDENT_KEY, data);
+    await redis.set(INCIDENT_KEY, data);
     return NextResponse.json(data);
   } catch (error) {
     console.error('Error saving incident data:', error);
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE() {
   try {
-    await kv.del(INCIDENT_KEY);
+    await redis.del(INCIDENT_KEY);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting incident data:', error);

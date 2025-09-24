@@ -1,6 +1,9 @@
-import { kv } from '@vercel/kv';
+import { Redis } from '@upstash/redis';
 
-export { kv };
+// initialize redis
+const redis = Redis.fromEnv();
 
-// Clave para almacenar los datos del incidente en Vercel KV
+export { redis };
+
+// key for storing incident data in Redis
 export const INCIDENT_KEY = 'poker-incident-tracker';
